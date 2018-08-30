@@ -4,11 +4,11 @@ with open('README.md') as readme:
     README = readme.read()
 
 setup(
-    name='dataclass_serde',
+    name='dataclass_structor',
     version='0.1',
-    description='A structur/destructor for dataclasses',
+    description='A type aware structor/destructor for python value objects.',
     long_description=README,
-    url='https://github.com/hockeybuggy/dataclass_serde',
+    url='https://github.com/hockeybuggy/dataclass_structor',
     author='Douglas Anderson',
     author_email='hockeybuggy@gmail.com',
     license='MIT',

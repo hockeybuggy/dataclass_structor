@@ -1,3 +1,5 @@
+import decimal
+import datetime
 from dataclasses import fields, is_dataclass
 from typing import Any, Dict, Optional, Type, TypeVar
 
@@ -5,18 +7,27 @@ from typing import Any, Dict, Optional, Type, TypeVar
 T = TypeVar("T")
 
 
-
 def unstructure(value: Any) -> Dict[str, Any]:
     """Returns dictionary given a value of a particular type"""
+    if value is None:
+        return value
     if isinstance(value, str):
         return value
+    if isinstance(value, float):
+        return value
+    if isinstance(value, int):
+        return value
+    if isinstance(value, decimal.Decimal):
+        return str(value)
+    if isinstance(value, datetime.datetime) or isinstance(value, datetime.date):
+        return value.isoformat()
     if isinstance(value, dict):
         return {k: unstructure(v) for k, v in value.items()}
     if is_dataclass(value):
         return {
             f.name: unstructure(getattr(value, f.name)) for f in fields(value)
         }
-    raise ValueError(f"Could not destructure: {value}")
+    raise ValueError(f"Could not unstructure: {value}")
 
 
 def structure(value: Any, goal_type: Type[T]) -> T:
@@ -25,6 +36,14 @@ def structure(value: Any, goal_type: Type[T]) -> T:
         obj = _try_structure_object(value, goal_type)
         if obj:
             return obj
+    if isinstance(value, str) and goal_type == float:
+        return float(value)
+    if isinstance(value, str) and goal_type == decimal.Decimal:
+        return decimal.Decimal(value)
+    if isinstance(value, str) and goal_type == datetime.datetime:
+        return datetime.datetime.fromisoformat(value)
+    if isinstance(value, str) and goal_type == datetime.date:
+        return datetime.date.fromisoformat(value)
     if isinstance(value, str):
         return value
     return value
