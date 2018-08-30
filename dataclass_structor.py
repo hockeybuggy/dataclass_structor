@@ -1,5 +1,7 @@
 import decimal
 import datetime
+import enum
+import uuid
 from dataclasses import fields, is_dataclass
 from typing import Any, Dict, Optional, Type, TypeVar
 
@@ -19,6 +21,10 @@ def unstructure(value: Any) -> Dict[str, Any]:
         return value
     if isinstance(value, decimal.Decimal):
         return str(value)
+    if isinstance(value, uuid.UUID):
+        return str(value)
+    if isinstance(value, enum.Enum):
+        return value.name
     if isinstance(value, datetime.datetime) or isinstance(value, datetime.date):
         return value.isoformat()
     if isinstance(value, dict):
@@ -40,13 +46,33 @@ def structure(value: Any, goal_type: Type[T]) -> T:
         return float(value)
     if isinstance(value, str) and goal_type == decimal.Decimal:
         return decimal.Decimal(value)
+
     if isinstance(value, str) and goal_type == datetime.datetime:
         return datetime.datetime.fromisoformat(value)
     if isinstance(value, str) and goal_type == datetime.date:
         return datetime.date.fromisoformat(value)
+    if isinstance(value, str) and goal_type == uuid.UUID:
+        return uuid.UUID(value)
+    if isinstance(value, str) and hasattr(goal_type, "mro") and enum.Enum in goal_type.mro():
+        if value in goal_type.__members__:
+            return goal_type[value]
+        return getattr(str, goal_type)
     if isinstance(value, str):
         return value
-    return value
+
+    if isinstance(value, int) and goal_type == decimal.Decimal:
+        return decimal.Decimal(value)
+    if isinstance(value, int):
+        return value
+
+    if isinstance(value, float) and goal_type == decimal.Decimal:
+        return decimal.Decimal(value)
+    if isinstance(value, float) and goal_type == float:
+        return value
+
+    if value is None:
+        return value
+    raise ValueError(f"Could not structure: {value} into {goal_type}")
 
 
 # TODO this could have a better type for value

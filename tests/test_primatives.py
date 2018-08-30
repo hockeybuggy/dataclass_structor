@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import uuid
 
 from dataclass_structor import structure, unstructure
 
@@ -62,3 +63,24 @@ def test_structure__datetime():
     input_datetime = "2018-02-01T02:02:02+00:00"
     expected = datetime.datetime(2018, 2, 1, 2, 2, 2, tzinfo=datetime.timezone.utc)
     assert structure(input_datetime, datetime.datetime) == expected
+
+
+def test_unstructure__bool():
+    assert unstructure(True) is True
+    assert unstructure(False) is False
+
+
+def test_structure__bool():
+    assert structure(True, bool) is True
+    assert structure(False, bool) is False
+
+
+def test_unstructure__uuid():
+    expected = "d1337d56-4e6a-4cf7-8f7a-730bf4ea3fac"
+    assert unstructure(uuid.UUID(expected)) == expected
+
+
+def test_structure__uuid():
+    uuid_str = "d1337d56-4e6a-4cf7-8f7a-730bf4ea3fac"
+    expected = uuid.UUID(uuid_str)
+    assert structure(uuid_str, uuid.UUID) == expected
