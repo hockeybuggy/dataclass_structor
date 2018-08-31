@@ -27,6 +27,8 @@ def unstructure(value: Any) -> Dict[str, Any]:
         return value.name
     if isinstance(value, datetime.datetime) or isinstance(value, datetime.date):
         return value.isoformat()
+    if isinstance(value, list):
+        return [unstructure(v) for v in value]
     if isinstance(value, dict):
         return {k: unstructure(v) for k, v in value.items()}
     if is_dataclass(value):
@@ -42,6 +44,12 @@ def structure(value: Any, goal_type: Type[T]) -> T:
         obj = _try_structure_object(value, goal_type)
         if obj:
             return obj
+    if isinstance(value, list):
+        obj = _try_structure_list(value, goal_type)
+        if obj is not None:
+            return obj
+    if isinstance(value, str) and goal_type == int:
+        return int(value)
     if isinstance(value, str) and goal_type == float:
         return float(value)
     if isinstance(value, str) and goal_type == decimal.Decimal:
@@ -62,6 +70,8 @@ def structure(value: Any, goal_type: Type[T]) -> T:
 
     if isinstance(value, int) and goal_type == decimal.Decimal:
         return decimal.Decimal(value)
+    if isinstance(value, int) and goal_type == str:
+        return str(value)
     if isinstance(value, int):
         return value
 
@@ -93,3 +103,8 @@ def _try_structure_object(value: Any, goal_type: Type[T]) -> Optional[T]:
             for k, v in value.items()
         }
     return None
+
+
+def _try_structure_list(value: Any, goal_type: Type[T]) -> Optional[T]:
+    list_content_type = goal_type.__args__[0]
+    return [structure(v, list_content_type) for v in value]
