@@ -3,13 +3,13 @@ import datetime
 import enum
 import uuid
 from dataclasses import fields, is_dataclass
-from typing import Any, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
+from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 
 T = TypeVar("T")
 
 
-def unstructure(value: Any) -> Dict[str, Any]:
+def unstructure(value: Any) -> Any:
     """Returns dictionary given a value of a particular type"""
     if value is None:
         return value
@@ -38,8 +38,10 @@ def unstructure(value: Any) -> Dict[str, Any]:
     raise ValueError(f"Could not unstructure: {value}")
 
 
-def structure(value: Any, goal_type: Type[T]) -> T:
+def structure(value: Any, goal_type: Any) -> Any:
     """Returns object given a value and type signature to be coerced into"""
+    if value is None:
+        return value
     if hasattr(goal_type, "__origin__") and goal_type.__origin__ is Union:
         return _structure_union(value, goal_type.__args__)
     return _structure_value(value, goal_type)
@@ -70,9 +72,9 @@ def _structure_value(value: Any, goal_type: Type[T]) -> T:
         obj = _try_structure_str(value, goal_type)
         if obj is not None:
             return obj
-    if value is None:
-        return value
-    raise ValueError(f"Could not structure: {value} into {goal_type}")
+    raise ValueError(
+        f"Could not structure: {value} of type {type(value)} into {goal_type}"
+    )
 
 
 def _structure_union(value: Any, union_types: Tuple[Type[T]]) -> Optional[T]:
@@ -96,21 +98,21 @@ def _structure_union(value: Any, union_types: Tuple[Type[T]]) -> Optional[T]:
     for a_type in type_priority:
         if a_type in results:
             return results[a_type]
+    return None
 
 
-# TODO this could have a better type for value
-def _try_structure_object(value: Any, goal_type: Type[T]) -> Optional[T]:
+def _try_structure_object(value: Any, goal_type: Any) -> Any:
     try:
         return goal_type(**{k: structure(v, type(v)) for k, v in value.items()})
     except (KeyError, ValueError):
         pass
     if issubclass(goal_type, dict):
-        dict_value_type = goal_type.__args__[1]  # type: ignore
+        dict_value_type = goal_type.__args__[1]
         return {k: structure(v, dict_value_type) for k, v in value.items()}
     return None
 
 
-def _try_structure_str(value: str, goal_type: Type[T]) -> Optional[T]:
+def _try_structure_str(value: str, goal_type: Any) -> Any:
     if goal_type == int:
         return int(value)
     if goal_type == float:
@@ -120,7 +122,7 @@ def _try_structure_str(value: str, goal_type: Type[T]) -> Optional[T]:
     if goal_type == datetime.datetime:
         return datetime.datetime.fromisoformat(value)
     if goal_type == datetime.date:
-        return datetime.date.fromisoformat(value)
+        return datetime.date.fromisoformat(value)  # type: ignore
     if goal_type == uuid.UUID:
         return uuid.UUID(value)
     if hasattr(goal_type, "mro") and enum.Enum in goal_type.mro():
@@ -130,7 +132,7 @@ def _try_structure_str(value: str, goal_type: Type[T]) -> Optional[T]:
     return value
 
 
-def _try_structure_int(value: int, goal_type: Type[T]) -> Optional[T]:
+def _try_structure_int(value: int, goal_type: Any) -> Union[int, decimal.Decimal, str]:
     if goal_type == decimal.Decimal:
         return decimal.Decimal(value)
     if goal_type == str:
@@ -138,18 +140,19 @@ def _try_structure_int(value: int, goal_type: Type[T]) -> Optional[T]:
     return value
 
 
-def _try_structure_float(value: float, goal_type: Type[T]) -> Optional[T]:
+def _try_structure_float(value: float, goal_type: Any) -> Union[float, decimal.Decimal, None]:
     if goal_type == decimal.Decimal:
         return decimal.Decimal(value)
     if goal_type == float:
         return value
+    return None
 
 
-def _try_structure_list(value: List[Any], goal_type: Type[T]) -> Optional[T]:
+def _try_structure_list(value: List[Any], goal_type: Any) -> List[Any]:
     list_content_type = goal_type.__args__[0]
     return [structure(v, list_content_type) for v in value]
 
 
-def _try_structure_set(value: Set[Any], goal_type: Type[T]) -> Optional[T]:
+def _try_structure_set(value: Set[Any], goal_type: Any) -> Set:
     set_content_type = goal_type.__args__[0]
     return set(structure(v, set_content_type) for v in value)
