@@ -16,9 +16,9 @@ mypy = "*"
 python_version = "3.7"
 
 [scripts]
-"format" = "black dataclass_structor.py tests"
-"check-format" = "black --diff --check dataclass_structor.py tests"
-"typecheck" = "mypy dataclass_structor.py"
+"format" = "black dataclass_structor tests"
+"check-format" = "black --diff --check dataclass_structor tests"
+"typecheck" = "mypy dataclass_structor"
 "test" = "pytest"
 
 [pipenv]
