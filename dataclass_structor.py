@@ -3,17 +3,7 @@ import datetime
 import enum
 import uuid
 from dataclasses import fields, is_dataclass
-from typing import (
-    Any,
-    Dict,
-    List,
-    Optional,
-    Set,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 
 T = TypeVar("T")
@@ -44,9 +34,7 @@ def unstructure(value: Any) -> Dict[str, Any]:
     if isinstance(value, dict):
         return {k: unstructure(v) for k, v in value.items()}
     if is_dataclass(value):
-        return {
-            f.name: unstructure(getattr(value, f.name)) for f in fields(value)
-        }
+        return {f.name: unstructure(getattr(value, f.name)) for f in fields(value)}
     raise ValueError(f"Could not unstructure: {value}")
 
 
@@ -95,7 +83,15 @@ def _structure_union(value: Any, union_types: Tuple[Type[T]]) -> Optional[T]:
         except ValueError:
             pass
     type_priority = (
-        datetime.datetime, datetime.date, uuid.UUID, dict, list, set, float, int, str
+        datetime.datetime,
+        datetime.date,
+        uuid.UUID,
+        dict,
+        list,
+        set,
+        float,
+        int,
+        str,
     )
     for a_type in type_priority:
         if a_type in results:
@@ -105,20 +101,12 @@ def _structure_union(value: Any, union_types: Tuple[Type[T]]) -> Optional[T]:
 # TODO this could have a better type for value
 def _try_structure_object(value: Any, goal_type: Type[T]) -> Optional[T]:
     try:
-        return goal_type(
-            **{
-                k: structure(v, type(v))
-                for k, v in value.items()
-            }
-        )
+        return goal_type(**{k: structure(v, type(v)) for k, v in value.items()})
     except (KeyError, ValueError):
         pass
     if issubclass(goal_type, dict):
         dict_value_type = goal_type.__args__[1]  # type: ignore
-        return {
-            k: structure(v, dict_value_type)
-            for k, v in value.items()
-        }
+        return {k: structure(v, dict_value_type) for k, v in value.items()}
     return None
 
 

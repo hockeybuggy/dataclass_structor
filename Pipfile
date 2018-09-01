@@ -4,10 +4,16 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-"self" = {path = ".", editable = true}
+"e1839a8" = {path = ".", editable = true}
 
 [dev-packages]
 pytest = "*"
+black = "*"
 
 [requires]
 python_version = "3.7"
+
+[scripts]
+"format" = "black dataclass_structor.py tests"
+"check-format" = "black --diff --check dataclass_structor.py tests"
+"test" = "pytest"
