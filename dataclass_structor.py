@@ -3,7 +3,17 @@ import datetime
 import enum
 import uuid
 from dataclasses import fields, is_dataclass
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 
 T = TypeVar("T")
@@ -29,6 +39,8 @@ def unstructure(value: Any) -> Dict[str, Any]:
         return value.isoformat()
     if isinstance(value, list):
         return [unstructure(v) for v in value]
+    if isinstance(value, set):
+        return set([unstructure(v) for v in value])
     if isinstance(value, dict):
         return {k: unstructure(v) for k, v in value.items()}
     if is_dataclass(value):
@@ -40,6 +52,12 @@ def unstructure(value: Any) -> Dict[str, Any]:
 
 def structure(value: Any, goal_type: Type[T]) -> T:
     """Returns object given a value and type signature to be coerced into"""
+    if hasattr(goal_type, "__origin__") and goal_type.__origin__ is Union:
+        return _structure_union(value, goal_type.__args__)
+    return _structure_value(value, goal_type)
+
+
+def _structure_value(value: Any, goal_type: Type[T]) -> T:
     if isinstance(value, dict):
         obj = _try_structure_object(value, goal_type)
         if obj:
@@ -48,41 +66,40 @@ def structure(value: Any, goal_type: Type[T]) -> T:
         obj = _try_structure_list(value, goal_type)
         if obj is not None:
             return obj
-    if isinstance(value, str) and goal_type == int:
-        return int(value)
-    if isinstance(value, str) and goal_type == float:
-        return float(value)
-    if isinstance(value, str) and goal_type == decimal.Decimal:
-        return decimal.Decimal(value)
-
-    if isinstance(value, str) and goal_type == datetime.datetime:
-        return datetime.datetime.fromisoformat(value)
-    if isinstance(value, str) and goal_type == datetime.date:
-        return datetime.date.fromisoformat(value)
-    if isinstance(value, str) and goal_type == uuid.UUID:
-        return uuid.UUID(value)
-    if isinstance(value, str) and hasattr(goal_type, "mro") and enum.Enum in goal_type.mro():
-        if value in goal_type.__members__:
-            return goal_type[value]
-        return getattr(str, goal_type)
-    if isinstance(value, str):
-        return value
-
-    if isinstance(value, int) and goal_type == decimal.Decimal:
-        return decimal.Decimal(value)
-    if isinstance(value, int) and goal_type == str:
-        return str(value)
+    if isinstance(value, set):
+        obj = _try_structure_set(value, goal_type)
+        if obj is not None:
+            return obj
+    if isinstance(value, float):
+        obj = _try_structure_float(value, goal_type)
+        if obj is not None:
+            return obj
     if isinstance(value, int):
-        return value
-
-    if isinstance(value, float) and goal_type == decimal.Decimal:
-        return decimal.Decimal(value)
-    if isinstance(value, float) and goal_type == float:
-        return value
-
+        obj = _try_structure_int(value, goal_type)
+        if obj is not None:
+            return obj
+    if isinstance(value, str):
+        obj = _try_structure_str(value, goal_type)
+        if obj is not None:
+            return obj
     if value is None:
         return value
     raise ValueError(f"Could not structure: {value} into {goal_type}")
+
+
+def _structure_union(value: Any, union_types: Tuple[Type[T]]) -> Optional[T]:
+    results = {}
+    for a_type in union_types:
+        try:
+            results[a_type] = structure(value, a_type)
+        except ValueError:
+            pass
+    type_priority = (
+        datetime.datetime, datetime.date, uuid.UUID, dict, list, set, float, int, str
+    )
+    for a_type in type_priority:
+        if a_type in results:
+            return results[a_type]
 
 
 # TODO this could have a better type for value
@@ -105,6 +122,46 @@ def _try_structure_object(value: Any, goal_type: Type[T]) -> Optional[T]:
     return None
 
 
-def _try_structure_list(value: Any, goal_type: Type[T]) -> Optional[T]:
+def _try_structure_str(value: str, goal_type: Type[T]) -> Optional[T]:
+    if goal_type == int:
+        return int(value)
+    if goal_type == float:
+        return float(value)
+    if goal_type == decimal.Decimal:
+        return decimal.Decimal(value)
+    if goal_type == datetime.datetime:
+        return datetime.datetime.fromisoformat(value)
+    if goal_type == datetime.date:
+        return datetime.date.fromisoformat(value)
+    if goal_type == uuid.UUID:
+        return uuid.UUID(value)
+    if hasattr(goal_type, "mro") and enum.Enum in goal_type.mro():
+        if value in goal_type.__members__:
+            return goal_type[value]
+        return getattr(str, goal_type)
+    return value
+
+
+def _try_structure_int(value: int, goal_type: Type[T]) -> Optional[T]:
+    if goal_type == decimal.Decimal:
+        return decimal.Decimal(value)
+    if goal_type == str:
+        return str(value)
+    return value
+
+
+def _try_structure_float(value: float, goal_type: Type[T]) -> Optional[T]:
+    if goal_type == decimal.Decimal:
+        return decimal.Decimal(value)
+    if goal_type == float:
+        return value
+
+
+def _try_structure_list(value: List[Any], goal_type: Type[T]) -> Optional[T]:
     list_content_type = goal_type.__args__[0]
     return [structure(v, list_content_type) for v in value]
+
+
+def _try_structure_set(value: Set[Any], goal_type: Type[T]) -> Optional[T]:
+    set_content_type = goal_type.__args__[0]
+    return set(structure(v, set_content_type) for v in value)
