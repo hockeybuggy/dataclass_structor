@@ -23,9 +23,9 @@ class Sounds(enum.Enum):
     DOG = "dog"
 
 
-def test_unstructure__animal():
+def test_unstructure__sounds():
     assert unstructure(Sounds.CAT) == "CAT"
 
 
-def test_structure__animal():
+def test_structure__sounds():
     assert structure("DOG", Sounds) == Sounds.DOG

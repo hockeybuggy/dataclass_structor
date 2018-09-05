@@ -84,21 +84,56 @@ def _try_structure_object(value: Any, goal_type: Any) -> Any:
 
 def _try_structure_str(value: str, goal_type: Any) -> Any:
     if goal_type == int:
-        return int(value)
+        try:
+            return int(value)
+        except ValueError as ex:
+            raise ValueError(
+                f"Could not convert {value} of type {type(value)} into an int."
+            ) from ex
     if goal_type == float:
-        return float(value)
+        try:
+            return float(value)
+        except ValueError as ex:
+            raise ValueError(
+                f"Could not convert {value} of type {type(value)} into a float."
+            ) from ex
     if goal_type == decimal.Decimal:
-        return decimal.Decimal(value)
+        try:
+            return decimal.Decimal(value)
+        except decimal.InvalidOperation as ex:
+            raise ValueError(
+                f"Could not convert {value} of type {type(value)} into a decimal.Decimal."
+            ) from ex
     if goal_type == datetime.datetime:
-        return datetime.datetime.fromisoformat(value)
+        try:
+            return datetime.datetime.fromisoformat(value)
+        except ValueError as ex:
+            raise ValueError(
+                f"Could not convert {value} of type {type(value)} into a datetime.datetime."
+            ) from ex
     if goal_type == datetime.date:
-        return datetime.date.fromisoformat(value)  # type: ignore
+        try:
+            return datetime.date.fromisoformat(value)  # type: ignore
+        except ValueError as ex:
+            raise ValueError(
+                f"Could not convert {value} of type {type(value)} into a datetime.date."
+            ) from ex
     if goal_type == uuid.UUID:
-        return uuid.UUID(value)
+        try:
+            return uuid.UUID(value)
+        except ValueError as ex:
+            raise ValueError(
+                f"Could not convert {value} of type {type(value)} into a uuid.UUID."
+            ) from ex
     if hasattr(goal_type, "mro") and enum.Enum in goal_type.mro():
         if value in goal_type.__members__:
             return goal_type[value]
-        return getattr(str, goal_type)
+        try:
+            return getattr(str, goal_type)
+        except TypeError as ex:
+            raise ValueError(
+                f"Could not convert {value} of type {type(value)} into a {goal_type} enum."
+            ) from ex
     return value
 
 
