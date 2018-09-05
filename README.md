@@ -2,11 +2,10 @@
 # Python Data class serializer/deserializer
 
 
-
 ## Install
 
 ```shell
-pipenv install 
+pip install data_structor
 ```
 
 ## Usage
@@ -14,17 +13,21 @@ pipenv install
 ```python
 import dataclasses
 
+from data_structor import structure, unstructure
+
+
 @dataclasses.dataclass
 class Invite:
     email: str
     guests: typing.List["Guest"]
+
 
 @dataclasses.dataclass
 class Guest:
     first_name: typing.Optional[str] = None
 
 
-x = to_dict(
+value_type = (
   Invite(
     email="testing",
     guests=[
@@ -32,7 +35,11 @@ x = to_dict(
       Guest(),
     ],
 )
-# x == {"email": "", "guests": [{"first_name": "John"}, {"first_name": None}]}
+
+x = unstructure(value_type)
+assert x == {"email": "", "guests": [{"first_name": "John"}, {"first_name": None}]}
+
+assert structure(x, Invite) == value_type
 ```
 
 
