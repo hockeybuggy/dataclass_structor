@@ -1,5 +1,11 @@
+# data_structor
 
-# Python Data class serializer/deserializer
+[![Build Status](https://travis-ci.com/hockeybuggy/dataclass_structor.svg?branch=master)](https://travis-ci.com/hockeybuggy/dataclass_structor)
+
+[![Documentation Status](https://readthedocs.org/projects/dataclass-structor/badge/?version=latest)](https://dataclass-structor.readthedocs.io/en/latest/?badge=latest)
+
+
+A type aware structor/destructor for python value objects.
 
 
 ## Install
@@ -8,7 +14,13 @@
 pip install data_structor
 ```
 
-## Usage
+
+## Documentation
+
+The [docs for this project can be found here](dataclass-structor.readthedocs.io).
+
+
+## Example
 
 ```python
 import dataclasses
