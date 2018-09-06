@@ -9,4 +9,4 @@ install:
 script:
     - pipenv run test
     - pipenv run typecheck
-    - pipenv run check-format
+    # - pipenv run check-format
