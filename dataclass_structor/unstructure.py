@@ -7,7 +7,20 @@ from typing import Any
 
 
 def unstructure(value: Any) -> Any:
-    """Returns dictionary given a value of a particular type"""
+    """Returns dictionary, composed of simple types, given a value of a
+    particular type.
+
+    :param value: An object that you would like to convert into a serializable
+        object.
+
+    Usage::
+
+      >>> import datetime
+      >>> import dataclass_structor
+
+      >>> dataclass_structor.unstructure(datetime.date(2018, 9, 5))
+      "2018-09-05"
+    """
     if value is None:
         return value
     if isinstance(value, str):

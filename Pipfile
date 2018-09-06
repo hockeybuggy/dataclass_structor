@@ -11,15 +11,18 @@ name = "pypi"
 pytest = "*"
 black = "*"
 mypy = "*"
+sphinx = "*"
+sphinx-autobuild = "*"
 
 [requires]
 python_version = "3.7"
 
 [scripts]
-"format" = "black dataclass_structor tests"
 "check-format" = "black --diff --check dataclass_structor tests"
-"typecheck" = "mypy dataclass_structor"
+"build-docs" = "sphinx-build -b html . ./_build"
+"format" = "black dataclass_structor tests"
 "test" = "pytest"
+"typecheck" = "mypy dataclass_structor"
 
 [pipenv]
 allow_prereleases = true

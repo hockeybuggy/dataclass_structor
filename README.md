@@ -27,8 +27,7 @@ class Guest:
     first_name: typing.Optional[str] = None
 
 
-value_type = (
-  Invite(
+value_type = Invite(
     email="testing",
     guests=[
       Guest(first_name="John"),
@@ -41,23 +40,3 @@ assert x == {"email": "", "guests": [{"first_name": "John"}, {"first_name": None
 
 assert structure(x, Invite) == value_type
 ```
-
-
-## Contributing
-
-```shell
-git clone <package>
-pipenv install --dev
-pipenv run pytest
-```
-
-
-## Questions to answer:
-
-- Why not the dataclasses `asdict`?
-
-- What about `cattrs`?
-
-- What about `marshmallow`?
-
-- Why is this not a JSON serializer?

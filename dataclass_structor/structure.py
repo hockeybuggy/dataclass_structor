@@ -9,7 +9,19 @@ T = TypeVar("T")
 
 
 def structure(value: Any, goal_type: Any) -> Any:
-    """Returns object given a value and type signature to be coerced into"""
+    """Returns object given a value and type signature to be coerced into.
+
+    :param value: A dict or list composed of primitive type (str, int, float)
+        or a primitive type.
+    :param goal_type: A type that you would like cast `value` into.
+
+    Usage::
+
+      >>> import datetime
+      >>> import dataclass_structor
+      >>> dataclass_structor.structure('2018-10-02', datetime.date)
+      datetime.datetime(2018, 10, 2)
+    """
     if value is None:
         return value
     if hasattr(goal_type, "__origin__") and goal_type.__origin__ is Union:
