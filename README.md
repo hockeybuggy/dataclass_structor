@@ -1,13 +1,9 @@
-# data_structor
+# dataclass_structor
 
 [![Documentation Status](https://readthedocs.org/projects/dataclass-structor/badge/?version=latest)](https://dataclass-structor.readthedocs.io/en/latest/?badge=latest)
-
 ![PyPI - License](https://img.shields.io/pypi/v/dataclass_structor.svg)
-
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dataclass_structor.svg)
-
 ![PyPI - License](https://img.shields.io/pypi/l/dataclass_structor.svg)
-
 [![Build Status](https://travis-ci.com/hockeybuggy/dataclass_structor.svg?branch=master)](https://travis-ci.com/hockeybuggy/dataclass_structor)
 
 
@@ -17,7 +13,7 @@ A type aware structor/destructor for python value objects.
 ## Install
 
 ```shell
-pip install data_structor
+pip install dataclass_structor
 ```
 
 
@@ -31,7 +27,7 @@ The [docs for this project can be found here](dataclass-structor.readthedocs.io)
 ```python
 import dataclasses
 
-from data_structor import structure, unstructure
+from dataclass_structor import structure, unstructure
 
 
 @dataclasses.dataclass
