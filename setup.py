@@ -10,6 +10,7 @@ setup(
     version=VERSION,
     description='A type aware structor/destructor for python value objects.',
     long_description=README,
+    long_description_content_type="text/markdown",
     url='https://github.com/hockeybuggy/dataclass_structor',
     author='Douglas Anderson',
     author_email='hockeybuggy@gmail.com',
