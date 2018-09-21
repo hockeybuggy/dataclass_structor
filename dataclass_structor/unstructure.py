@@ -39,6 +39,8 @@ def unstructure(value: Any) -> Any:
         return value.isoformat()
     if isinstance(value, list):
         return [unstructure(v) for v in value]
+    if isinstance(value, tuple):
+        return tuple([unstructure(v) for v in value])
     if isinstance(value, set):
         return set([unstructure(v) for v in value])
     if isinstance(value, dict):

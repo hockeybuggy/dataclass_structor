@@ -10,12 +10,12 @@ def test_unstructure__set():
 
 
 def test_structure__homogeneous_set():
-    assert structure(set([]), Set[int]) == set([])
-    assert structure(set(["1"]), Set[int]) == set([1])
-    assert structure(set(["1"]), Set[str]) == set(["1"])
+    assert structure([], Set[int]) == set([])
+    assert structure(["1"], Set[int]) == set([1])
+    assert structure(["1"], Set[str]) == set(["1"])
 
 
 def test_structure__hetrogeneous_set():
-    assert structure(set(["1", 2]), Set[int]) == set([1, 2])
-    assert structure(set(["1", 2]), Set[str]) == set(["1", "2"])
-    assert structure(set(["1", 2]), Set[str]) == set(["1", "2"])
+    assert structure(["1", 2], Set[int]) == set([1, 2])
+    assert structure(["1", 2], Set[str]) == set(["1", "2"])
+    assert structure(["1", 2], Set[str]) == set(["1", "2"])
