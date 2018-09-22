@@ -22,7 +22,7 @@ python_version = "3.7"
 "check-format" = "black --diff --check dataclass_structor tests"
 "build-docs" = "sphinx-build -b html . ./_build"
 "format" = "black dataclass_structor tests"
-"perf-tests" = "python tests/perf_tests.py"
+"perf-tests" = "python tests/perf_tests.py -o bench.json"
 "test" = "pytest"
 "typecheck" = "mypy dataclass_structor"
 

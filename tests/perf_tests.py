@@ -1,8 +1,10 @@
+import typing
 import perf
 import decimal
 import datetime
 
 from dataclass_structor import structure, unstructure
+from _fixtures import AnimalEnum, DataClassGuest, SoundsEnum
 
 
 def unstructure_assorted_primatives():
@@ -30,10 +32,43 @@ def structure_assorted_simple_types():
     structure(1.0, float)
 
 
+def unstructure_enums():
+    unstructure(AnimalEnum.ANT)
+    unstructure(SoundsEnum.CAT)
+
+
+def structure_enums():
+    structure("BEE", AnimalEnum)
+    structure("DOG", SoundsEnum)
+
+
+def structure_unions():
+    structure("Potato", typing.Union[int, str])
+    structure(1, typing.Union[int, str])
+    structure(None, typing.Optional[str])
+    structure("Potato", typing.Optional[str])
+
+
+def unstructure_dataclass():
+    unstructure(DataClassGuest(first_name="Bobby Jim"))
+
+
+def structure_dataclass():
+    structure({"first_name": "Bobby Jim"}, DataClassGuest)
+
+
 runner = perf.Runner(processes=5)
-runner.bench_func("unstructure_assorted_primatives", unstructure_assorted_primatives)
-runner.bench_func("structure_assorted_primatives", structure_assorted_primatives)
-runner.bench_func(
-    "unstructure_assorted_simple_types", unstructure_assorted_simple_types
-)
-runner.bench_func("structure_assorted_simple_types", structure_assorted_simple_types)
+benchmark_fns = [
+    unstructure_assorted_primatives,
+    structure_assorted_primatives,
+    unstructure_assorted_simple_types,
+    structure_assorted_simple_types,
+    unstructure_enums,
+    structure_enums,
+    structure_unions,
+    unstructure_dataclass,
+    structure_dataclass,
+]
+
+for fn in benchmark_fns:
+    runner.bench_func(fn.__name__, fn)
