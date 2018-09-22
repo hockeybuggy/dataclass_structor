@@ -14,9 +14,9 @@ def test_structure__tuple__size_zero():
 
 def test_structure__tuple__size_one():
     assert structure([1], Tuple[int]) == tuple([1])
-    assert structure(['x'], Tuple[str]) == tuple(['x'])
-    assert structure(['1'], Tuple[int]) == tuple([1])
+    assert structure(["x"], Tuple[str]) == tuple(["x"])
+    assert structure(["1"], Tuple[int]) == tuple([1])
 
 
 def test_structure__tuple__size_two_or_more():
-    assert structure(['1', 'x', 2], Tuple[int, str, int]) == tuple([1, 'x', 2])
+    assert structure(["1", "x", 2], Tuple[int, str, int]) == tuple([1, "x", 2])

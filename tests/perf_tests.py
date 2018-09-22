@@ -31,7 +31,9 @@ def structure_assorted_simple_types():
 
 
 runner = perf.Runner(processes=5)
-runner.bench_func('unstructure_assorted_primatives', unstructure_assorted_primatives)
-runner.bench_func('structure_assorted_primatives', structure_assorted_primatives)
-runner.bench_func('unstructure_assorted_simple_types', unstructure_assorted_simple_types)
-runner.bench_func('structure_assorted_simple_types', structure_assorted_simple_types)
+runner.bench_func("unstructure_assorted_primatives", unstructure_assorted_primatives)
+runner.bench_func("structure_assorted_primatives", structure_assorted_primatives)
+runner.bench_func(
+    "unstructure_assorted_simple_types", unstructure_assorted_simple_types
+)
+runner.bench_func("structure_assorted_simple_types", structure_assorted_simple_types)

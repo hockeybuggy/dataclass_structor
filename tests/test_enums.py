@@ -1,13 +1,5 @@
-import enum
-
 from dataclass_structor import structure, unstructure
-
-
-class Animal(enum.Enum):
-    ANT = 1
-    BEE = 2
-    CAT = 3
-    DOG = 4
+from _fixtures import AnimalEnum as Animal, SoundsEnum as Sounds
 
 
 def test_unstructure__animal():
@@ -16,11 +8,6 @@ def test_unstructure__animal():
 
 def test_structure__animal():
     assert structure("BEE", Animal) == Animal.BEE
-
-
-class Sounds(enum.Enum):
-    CAT = "meow"
-    DOG = "dog"
 
 
 def test_unstructure__sounds():

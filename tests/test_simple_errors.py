@@ -1,11 +1,11 @@
 import datetime
 import decimal
-import enum
 import uuid
 
 import pytest
 
 from dataclass_structor import structure
+from _fixtures import AnimalEnum, SoundsEnum
 
 
 def test_structure__bad_str__int():
@@ -59,28 +59,18 @@ def test_structure__bad_str__uuid():
 
 
 def test_structure__bad_str__int_enum():
-    class Animal(enum.Enum):
-        ANT = 1
-        BEE = 2
-        CAT = 3
-        DOG = 4
-
     with pytest.raises(ValueError) as exinfo:
-        structure("Tomato", Animal)
+        structure("Tomato", AnimalEnum)
     assert (
-        "Could not convert Tomato of type <class 'str'> into a <enum 'Animal'> enum."
+        "Could not convert Tomato of type <class 'str'> into a <enum 'AnimalEnum'> enum."
         in str(exinfo.value)
     )
 
 
 def test_structure__bad_str__str_enum():
-    class Sounds(enum.Enum):
-        CAT = "meow"
-        DOG = "dog"
-
     with pytest.raises(ValueError) as exinfo:
-        structure("Tomato", Sounds)
+        structure("Tomato", SoundsEnum)
     assert (
-        "Could not convert Tomato of type <class 'str'> into a <enum 'Sounds'> enum."
+        "Could not convert Tomato of type <class 'str'> into a <enum 'SoundsEnum'> enum."
         in str(exinfo.value)
     )

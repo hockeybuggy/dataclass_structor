@@ -34,11 +34,11 @@ def _structure_value(value: Any, goal_type: Type[T]) -> T:
         obj = _try_structure_object(value, goal_type)
         if obj:
             return obj
-    if hasattr(goal_type, '_name') and goal_type._name == 'Tuple':
+    if hasattr(goal_type, "_name") and goal_type._name == "Tuple":
         obj = _try_structure_tuple(value, goal_type)
         if obj is not None:
             return obj
-    if hasattr(goal_type, '_name') and goal_type._name == 'Set':
+    if hasattr(goal_type, "_name") and goal_type._name == "Set":
         obj = _try_structure_set(value, goal_type)
         if obj is not None:
             return obj
@@ -183,6 +183,4 @@ def _try_structure_set(value: Set[Any], goal_type: Any) -> Set:
 
 def _try_structure_tuple(value: Tuple[Any], goal_type: Any) -> Tuple:
     tuple_content_types = goal_type.__args__
-    return tuple(
-        structure(value[i], t) for i, t in enumerate(tuple_content_types)
-    )
+    return tuple(structure(value[i], t) for i, t in enumerate(tuple_content_types))

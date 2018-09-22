@@ -47,6 +47,6 @@ def unstructure(value: Any) -> Any:
         return {k: unstructure(v) for k, v in value.items()}
     if is_dataclass(value):
         return {f.name: unstructure(getattr(value, f.name)) for f in fields(value)}
-    if hasattr(value, '__slots__'):
+    if hasattr(value, "__slots__"):
         return {f: unstructure(getattr(value, f)) for f in value.__slots__}
     raise ValueError(f"Could not unstructure: {value}")
