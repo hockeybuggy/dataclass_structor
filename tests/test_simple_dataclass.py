@@ -1,12 +1,6 @@
-import typing
-import dataclasses
-
 from dataclass_structor import structure, unstructure
 
-
-@dataclasses.dataclass
-class Guest:
-    first_name: typing.Optional[str] = None
+from _fixtures import DataClassGuest as Guest
 
 
 def test_unstructure__guest_with_first_name():

@@ -1,19 +1,5 @@
-import typing
-
 from dataclass_structor import structure, unstructure
-
-
-class Guest:
-    __slots__ = ("first_name",)
-
-    def __init__(self, first_name: typing.Optional[str] = None):
-        self.first_name = first_name
-
-    def __repr__(self):
-        return f"Guest(first_name={repr(self.first_name)})"
-
-    def __eq__(self, other):
-        return self.first_name == other.first_name
+from _fixtures import SlottedGuest as Guest
 
 
 def test_unstructure__guest_with_first_name():
