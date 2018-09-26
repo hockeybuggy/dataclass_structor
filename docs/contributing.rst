@@ -30,15 +30,33 @@ as be formatted "correctly".
 
 To run the tests::
 
-    pipenv run test  # This will run pytest
+    make test
 
 To check that the types are correct::
 
-    pipenv run typecheck  # This will run mypy
+    make typecheck  # This will run mypy
 
 To format the code run::
 
-    pipenv run format  # This will run black
+    make format  # This will run black
+
+To format the code run::
+
+Running performance tests:
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This package has some performance tests that measure the performance of the
+`structure` and `unstructure` functions. The intention is that these tests can
+be used to see how proposed changes affect the speed execution.
+
+To run the performance tests::
+    make perf-tests
+
+To see the results of the performance tests::
+	pipenv run python -m perf show bench.json
+
+For more perf functions see this doc:
+https://perf.readthedocs.io/en/latest/cli.html
 
 
 Updating documentation:
@@ -48,7 +66,7 @@ If you would like to update documentation::
 
     git clone dataclass_structor
     pipenv install --dev
-    pipenv run build-docs
+    make build-docs
 
 Code of Conduct
 ---------------

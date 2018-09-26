@@ -7,6 +7,7 @@ install:
     - pipenv install --dev
 
 script:
-    - pipenv run test
-    - pipenv run typecheck
-    # - pipenv run check-format
+    - make test
+    - make typecheck
+    - make check-format
+    - make perf-tests
