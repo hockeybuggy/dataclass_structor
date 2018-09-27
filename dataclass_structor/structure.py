@@ -29,39 +29,47 @@ def structure(value: Any, goal_type: Any) -> Any:
     return _structure_value(value, goal_type)
 
 
+_structure_value_condition_conversion_pairs = [
+    (lambda v, gt: isinstance(v, dict), lambda v, gt: _try_structure_object(v, gt)),
+    (
+        lambda v, gt: hasattr(gt, "_name") and gt._name == "Tuple",
+        lambda v, gt: _try_structure_tuple(v, gt),
+    ),
+    (
+        lambda v, gt: hasattr(gt, "_name") and gt._name == "Set",
+        lambda v, gt: _try_structure_set(v, gt),
+    ),
+    (lambda v, gt: isinstance(v, list), lambda v, gt: _try_structure_list(v, gt)),
+    (lambda v, gt: isinstance(v, float), lambda v, gt: _try_structure_float(v, gt)),
+    (lambda v, gt: isinstance(v, int), lambda v, gt: _try_structure_int(v, gt)),
+    (lambda v, gt: isinstance(v, str), lambda v, gt: _try_structure_str(v, gt)),
+]
+
+
 def _structure_value(value: Any, goal_type: Type[T]) -> T:
-    if isinstance(value, dict):
-        obj = _try_structure_object(value, goal_type)
-        if obj:
-            return obj
-    if hasattr(goal_type, "_name") and goal_type._name == "Tuple":
-        obj = _try_structure_tuple(value, goal_type)
-        if obj is not None:
-            return obj
-    if hasattr(goal_type, "_name") and goal_type._name == "Set":
-        obj = _try_structure_set(value, goal_type)
-        if obj is not None:
-            return obj
-    if isinstance(value, list):
-        obj = _try_structure_list(value, goal_type)
-        if obj is not None:
-            return obj
-    if isinstance(value, float):
-        obj = _try_structure_float(value, goal_type)
-        if obj is not None:
-            return obj
-    if isinstance(value, int):
-        obj = _try_structure_int(value, goal_type)
-        if obj is not None:
-            return obj
-    if isinstance(value, str):
-        obj = _try_structure_str(value, goal_type)
-        if obj is not None:
-            return obj
+    for condition, conversion in _structure_value_condition_conversion_pairs:
+        if condition(value, goal_type):
+            # This could be a good place for PEP 572 the assignment operator
+            # but since Python 3.7 is a target we shall do without.
+            obj = conversion(value, goal_type)
+            if obj is not None:
+                return obj
     raise ValueError(
         f"Could not structure: {value} of type {type(value)} into {goal_type}"
     )
 
+
+_structure_union_type_priority = (
+    datetime.datetime,
+    datetime.date,
+    uuid.UUID,
+    dict,
+    list,
+    set,
+    float,
+    int,
+    str,
+)
 
 def _structure_union(value: Any, union_types: Tuple[Type[T]]) -> Optional[T]:
     results = {}
@@ -70,18 +78,8 @@ def _structure_union(value: Any, union_types: Tuple[Type[T]]) -> Optional[T]:
             results[a_type] = structure(value, a_type)
         except ValueError:
             pass
-    type_priority = (
-        datetime.datetime,
-        datetime.date,
-        uuid.UUID,
-        dict,
-        list,
-        set,
-        float,
-        int,
-        str,
-    )
-    for a_type in type_priority:
+
+    for a_type in _structure_union_type_priority:
         if a_type in results:
             return results[a_type]
     return None
