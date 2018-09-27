@@ -71,6 +71,7 @@ _structure_union_type_priority = (
     str,
 )
 
+
 def _structure_union(value: Any, union_types: Tuple[Type[T]]) -> Optional[T]:
     results = {}
     for a_type in union_types:
@@ -96,49 +97,33 @@ def _try_structure_object(value: Any, goal_type: Any) -> Any:
     return None
 
 
+def _try_convert_string_to_decimal(value):
+    try:
+        return decimal.Decimal(value)
+    except decimal.InvalidOperation as ex:
+        raise ValueError from ex
+
+
+_structure_str_goal_type_to_conversion_map = {
+    int: lambda v: int(v),
+    float: lambda v: float(v),
+    decimal.Decimal: lambda v: _try_convert_string_to_decimal(v),
+    datetime.datetime: lambda v: datetime.datetime.fromisoformat(v),
+    datetime.date: lambda v: datetime.date.fromisoformat(v),
+    uuid.UUID: lambda v: uuid.UUID(v),
+}
+
+
 def _try_structure_str(value: str, goal_type: Any) -> Any:
-    if goal_type == int:
+    conversion = _structure_str_goal_type_to_conversion_map.get(goal_type)
+    if conversion:
         try:
-            return int(value)
+            return conversion(value)
         except ValueError as ex:
             raise ValueError(
-                f"Could not convert {value} of type {type(value)} into an int."
+                f"Could not convert {value} of type {type(value)} into a {goal_type}."
             ) from ex
-    if goal_type == float:
-        try:
-            return float(value)
-        except ValueError as ex:
-            raise ValueError(
-                f"Could not convert {value} of type {type(value)} into a float."
-            ) from ex
-    if goal_type == decimal.Decimal:
-        try:
-            return decimal.Decimal(value)
-        except decimal.InvalidOperation as ex:
-            raise ValueError(
-                f"Could not convert {value} of type {type(value)} into a decimal.Decimal."
-            ) from ex
-    if goal_type == datetime.datetime:
-        try:
-            return datetime.datetime.fromisoformat(value)
-        except ValueError as ex:
-            raise ValueError(
-                f"Could not convert {value} of type {type(value)} into a datetime.datetime."
-            ) from ex
-    if goal_type == datetime.date:
-        try:
-            return datetime.date.fromisoformat(value)  # type: ignore
-        except ValueError as ex:
-            raise ValueError(
-                f"Could not convert {value} of type {type(value)} into a datetime.date."
-            ) from ex
-    if goal_type == uuid.UUID:
-        try:
-            return uuid.UUID(value)
-        except ValueError as ex:
-            raise ValueError(
-                f"Could not convert {value} of type {type(value)} into a uuid.UUID."
-            ) from ex
+
     if hasattr(goal_type, "mro") and enum.Enum in goal_type.mro():
         if value in goal_type.__members__:
             return goal_type[value]

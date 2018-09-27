@@ -11,7 +11,7 @@ from _fixtures import AnimalEnum, SoundsEnum
 def test_structure__bad_str__int():
     with pytest.raises(ValueError) as exinfo:
         structure("Tomato", int)
-    assert "Could not convert Tomato of type <class 'str'> into an int" in str(
+    assert "Could not convert Tomato of type <class 'str'> into a <class 'int'>" in str(
         exinfo.value
     )
 
@@ -19,8 +19,9 @@ def test_structure__bad_str__int():
 def test_structure__bad_str__float():
     with pytest.raises(ValueError) as exinfo:
         structure("Tomato", float)
-    assert "Could not convert Tomato of type <class 'str'> into a float" in str(
-        exinfo.value
+    assert (
+        "Could not convert Tomato of type <class 'str'> into a <class 'float'>"
+        in str(exinfo.value)
     )
 
 
@@ -28,7 +29,7 @@ def test_structure__bad_str__decimal():
     with pytest.raises(ValueError) as exinfo:
         structure("Tomato", decimal.Decimal)
     assert (
-        "Could not convert Tomato of type <class 'str'> into a decimal.Decimal"
+        "Could not convert Tomato of type <class 'str'> into a <class 'decimal.Decimal'>"
         in str(exinfo.value)
     )
 
@@ -36,8 +37,9 @@ def test_structure__bad_str__decimal():
 def test_structure__bad_str__date():
     with pytest.raises(ValueError) as exinfo:
         structure("Tomato", datetime.date)
-    assert "Could not convert Tomato of type <class 'str'> into a datetime.date" in str(
-        exinfo.value
+    assert (
+        "Could not convert Tomato of type <class 'str'> into a <class 'datetime.date'>"
+        in str(exinfo.value)
     )
 
 
@@ -45,7 +47,7 @@ def test_structure__bad_str__datetime():
     with pytest.raises(ValueError) as exinfo:
         structure("Tomato", datetime.datetime)
     assert (
-        "Could not convert Tomato of type <class 'str'> into a datetime.datetime"
+        "Could not convert Tomato of type <class 'str'> into a <class 'datetime.datetime'>"
         in str(exinfo.value)
     )
 
@@ -53,8 +55,9 @@ def test_structure__bad_str__datetime():
 def test_structure__bad_str__uuid():
     with pytest.raises(ValueError) as exinfo:
         structure("Tomato", uuid.UUID)
-    assert "Could not convert Tomato of type <class 'str'> into a uuid.UUID" in str(
-        exinfo.value
+    assert (
+        "Could not convert Tomato of type <class 'str'> into a <class 'uuid.UUID'>"
+        in str(exinfo.value)
     )
 
 
