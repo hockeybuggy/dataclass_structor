@@ -2,7 +2,18 @@ import decimal
 import datetime
 import enum
 import uuid
-from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
+from typing import (
+    get_type_hints,
+    Any,
+    Callable,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 
 T = TypeVar("T")
@@ -29,6 +40,12 @@ def structure(value: Any, goal_type: Any) -> Any:
     return _structure_value(value, goal_type)
 
 
+# When structuring values the first value in each pair is used as a condition
+# which if true will attempt to structure the value using the second item in
+# the pair. Both items in the pair will be called with the value as the first
+# argument and the "goal type" as the second argument.
+# The order of this list of pairs denotes what order values will be structured
+# by.
 _structure_value_condition_conversion_pairs = [
     (lambda v, gt: isinstance(v, dict), lambda v, gt: _try_structure_object(v, gt)),
     (
@@ -39,7 +56,10 @@ _structure_value_condition_conversion_pairs = [
         lambda v, gt: hasattr(gt, "_name") and gt._name == "Set",
         lambda v, gt: _try_structure_set(v, gt),
     ),
-    (lambda v, gt: isinstance(v, list), lambda v, gt: _try_structure_list(v, gt)),
+    (
+        lambda v, gt: hasattr(gt, "_name") and gt._name == "List",
+        lambda v, gt: _try_structure_list(v, gt),
+    ),
     (lambda v, gt: isinstance(v, float), lambda v, gt: _try_structure_float(v, gt)),
     (lambda v, gt: isinstance(v, int), lambda v, gt: _try_structure_int(v, gt)),
     (lambda v, gt: isinstance(v, str), lambda v, gt: _try_structure_str(v, gt)),
@@ -86,10 +106,22 @@ def _structure_union(value: Any, union_types: Tuple[Type[T]]) -> Optional[T]:
     return None
 
 
+def _get_types_from_object_or_its_constructor(goal_type):
+    own_hints = get_type_hints(goal_type)
+    if own_hints:
+        return own_hints
+    return get_type_hints(goal_type.__init__)
+
+
 def _try_structure_object(value: Any, goal_type: Any) -> Any:
     try:
-        return goal_type(**{k: structure(v, type(v)) for k, v in value.items()})
-    except (KeyError, ValueError):
+        return goal_type(
+            **{
+                k: structure(v, _get_types_from_object_or_its_constructor(goal_type)[k])
+                for k, v in value.items()
+            }
+        )
+    except (KeyError, ValueError) as e:
         pass
     if issubclass(goal_type, dict):
         dict_value_type = goal_type.__args__[1]
