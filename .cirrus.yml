@@ -1,5 +1,8 @@
 container:
-  image: python:3.7
+  # This isn't really ideal. Unfortuantly the `python:3.7` image doesn't have
+  # pipenv install and doesn't really have a plan to. This isn't great because
+  # it's based off of the `heroku/heroku:18` image.
+  image: kennethreitz/pipenv
 
 test_task:
   pip_cache:
@@ -8,3 +11,19 @@ test_task:
     populate_script: pipenv install --dev
 
   test_script: pipenv run python -m pytest
+
+typecheck_task:
+  pip_cache:
+    folder: ~/.cache/pip
+    fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock
+    populate_script: pipenv install --dev
+
+  test_script: pipenv run python -m mypy dataclass_structor
+
+formatter_task:
+  pip_cache:
+    folder: ~/.cache/pip
+    fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock
+    populate_script: pipenv install --dev
+
+  test_script: pipenv run python -m black --diff --check dataclass_structor tests

@@ -4,8 +4,7 @@
 ![PyPI - License](https://img.shields.io/pypi/v/dataclass_structor.svg)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dataclass_structor.svg)
 ![PyPI - License](https://img.shields.io/pypi/l/dataclass_structor.svg)
-[![Build Status](https://travis-ci.com/hockeybuggy/dataclass_structor.svg?branch=master)](https://travis-ci.com/hockeybuggy/dataclass_structor)
-
+[![Build Status](https://api.cirrus-ci.com/github/hockeybuggy/dataclass_structor.svg)](https://cirrus-ci.com/github/hockeybuggy/dataclass_structor)
 
 A type aware structor/destructor for python value objects.
 
