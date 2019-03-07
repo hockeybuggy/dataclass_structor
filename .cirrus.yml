@@ -1,0 +1,10 @@
+container:
+  image: python:3.7
+
+test_task:
+  pip_cache:
+    folder: ~/.cache/pip
+    fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock
+    populate_script: pipenv install --dev
+
+  test_script: pipenv run python -m pytest
