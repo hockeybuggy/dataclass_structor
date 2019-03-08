@@ -2,7 +2,20 @@ import decimal
 import datetime
 import enum
 import uuid
-from typing import get_type_hints, Any, List, Optional, Set, Tuple, Type, TypeVar, Union
+from typing import (
+    get_type_hints,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Iterable,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 
 T = TypeVar("T")  # pylint: disable=invalid-name
@@ -86,7 +99,7 @@ def _try_convert_string_to_decimal(value):
         raise ValueError from ex
 
 
-_STRUCTURE_STR_GOAL_TYPE_TO_CONVERSION_MAP = {
+_STRUCTURE_STR_GOAL_TYPE_TO_CONVERSION_MAP: Dict[Type, Callable] = {
     int: int,
     float: float,
     decimal.Decimal: _try_convert_string_to_decimal,
@@ -157,7 +170,7 @@ def _try_structure_tuple(value: Tuple[Any], goal_type: Any) -> Tuple:
 # argument and the "goal type" as the second argument.
 # The order of this list of pairs denotes what order values will be structured
 # by.
-_STRUCTURE_VALUE_CONDITION_CONVERSION_PAIRS = [
+_STRUCTURE_VALUE_CONDITION_CONVERSION_PAIRS: Iterable[Tuple[Callable, Callable]] = [
     (lambda v, gt: isinstance(v, dict), _try_structure_object),
     (lambda v, gt: getattr(gt, "_name", None) == "Tuple", _try_structure_tuple),
     (lambda v, gt: getattr(gt, "_name", None) == "Set", _try_structure_set),

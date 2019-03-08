@@ -3,7 +3,7 @@ import datetime
 import enum
 import uuid
 from dataclasses import fields, is_dataclass
-from typing import Any
+from typing import Any, Callable, Iterable, Tuple
 
 
 def unstructure(value: Any) -> Any:
@@ -28,7 +28,7 @@ def unstructure(value: Any) -> Any:
     raise ValueError(f"Could not unstructure: {value}")
 
 
-_UNSTRUCTURE_VALUE_CONDITION_CONVERSION_PAIRS = [
+_UNSTRUCTURE_VALUE_CONDITION_CONVERSION_PAIRS: Iterable[Tuple[Callable, Callable]] = [
     (lambda v: v is None, lambda v: v),
     (lambda v: isinstance(v, str), lambda v: v),
     (lambda v: isinstance(v, float), lambda v: v),
