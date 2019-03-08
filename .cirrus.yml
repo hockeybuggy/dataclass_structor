@@ -1,34 +1,23 @@
 container:
   image: python:3.7
 
-test_task:
-  pip_cache:
-    folder: ~/.cache/pip
-    fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock && echo "cache version 1"
-    populate_script: pip install black mypy pylint pytest
+pip_cache: &pip_cache
+  folder: ~/.cache/pip
+  fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock && echo "cache version 2"
+  populate_script: pip install black mypy pylint pytest
 
+test_task:
+  pip_cache: *pip_cache
   test_script: python -m pytest
 
 typecheck_task:
-  pip_cache:
-    folder: ~/.cache/pip
-    fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock && echo "cache version 1"
-    populate_script: pip install black mypy pylint pytest
-
+  pip_cache: *pip_cache
   test_script: python -m mypy dataclass_structor
 
 formatter_task:
-  pip_cache:
-    folder: ~/.cache/pip
-    fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock && echo "cache version 1"
-    populate_script: pip install black mypy pylint pytest
-
-  test_script: python -m pylint
+  pip_cache: *pip_cache
+  test_script: python -m black --diff --check dataclass_structor tests
 
 linter_task:
-  pip_cache:
-    folder: ~/.cache/pip
-    fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock && echo "cache version 1"
-    populate_script: pip install black mypy pylint pytest
-
+  pip_cache: *pip_cache
   test_script: pylint --rcfile=.pylintrc dataclass_structor tests
