@@ -1,4 +1,3 @@
-
 from .structure import structure
 from .unstructure import unstructure
 
