@@ -3,7 +3,7 @@ container:
 
 pip_cache: &pip_cache
   folder: ~/.cache/pip
-  fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock && echo "cache version 2"
+  fingerprint_script: echo $PYTHON_VERSION && echo $CIRRUS_CHANGE_IN_REPO
   populate_script: pip install black mypy pylint pytest
 
 test_task:
