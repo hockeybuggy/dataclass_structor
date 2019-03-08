@@ -3,7 +3,7 @@ import typing
 
 from dataclass_structor import structure, unstructure
 
-from _fixtures import DataClassGuest as Guest
+from ._fixtures import DataClassGuest as Guest
 
 
 @dataclasses.dataclass

@@ -1,5 +1,5 @@
 from dataclass_structor import structure, unstructure
-from _fixtures import AnimalEnum as Animal, SoundsEnum as Sounds
+from ._fixtures import AnimalEnum as Animal, SoundsEnum as Sounds
 
 
 def test_unstructure__animal():

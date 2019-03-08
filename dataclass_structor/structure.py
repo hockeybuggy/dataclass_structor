@@ -2,21 +2,10 @@ import decimal
 import datetime
 import enum
 import uuid
-from typing import (
-    get_type_hints,
-    Any,
-    Callable,
-    List,
-    Optional,
-    Set,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import get_type_hints, Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 
-T = TypeVar("T")
+T = TypeVar("T")  # pylint: disable=invalid-name
 
 
 def structure(value: Any, goal_type: Any) -> Any:
@@ -40,46 +29,7 @@ def structure(value: Any, goal_type: Any) -> Any:
     return _structure_value(value, goal_type)
 
 
-# When structuring values the first value in each pair is used as a condition
-# which if true will attempt to structure the value using the second item in
-# the pair. Both items in the pair will be called with the value as the first
-# argument and the "goal type" as the second argument.
-# The order of this list of pairs denotes what order values will be structured
-# by.
-_structure_value_condition_conversion_pairs = [
-    (lambda v, gt: isinstance(v, dict), lambda v, gt: _try_structure_object(v, gt)),
-    (
-        lambda v, gt: hasattr(gt, "_name") and gt._name == "Tuple",
-        lambda v, gt: _try_structure_tuple(v, gt),
-    ),
-    (
-        lambda v, gt: hasattr(gt, "_name") and gt._name == "Set",
-        lambda v, gt: _try_structure_set(v, gt),
-    ),
-    (
-        lambda v, gt: hasattr(gt, "_name") and gt._name == "List",
-        lambda v, gt: _try_structure_list(v, gt),
-    ),
-    (lambda v, gt: isinstance(v, float), lambda v, gt: _try_structure_float(v, gt)),
-    (lambda v, gt: isinstance(v, int), lambda v, gt: _try_structure_int(v, gt)),
-    (lambda v, gt: isinstance(v, str), lambda v, gt: _try_structure_str(v, gt)),
-]
-
-
-def _structure_value(value: Any, goal_type: Type[T]) -> T:
-    for condition, conversion in _structure_value_condition_conversion_pairs:
-        if condition(value, goal_type):
-            # This could be a good place for PEP 572 the assignment operator
-            # but since Python 3.7 is a target we shall do without.
-            obj = conversion(value, goal_type)
-            if obj is not None:
-                return obj
-    raise ValueError(
-        f"Could not structure: {value} of type {type(value)} into {goal_type}"
-    )
-
-
-_structure_union_type_priority = (
+_STRUCTURE_UNION_TYPE_PRIORITY = (
     datetime.datetime,
     datetime.date,
     uuid.UUID,
@@ -100,7 +50,7 @@ def _structure_union(value: Any, union_types: Tuple[Type[T]]) -> Optional[T]:
         except ValueError:
             pass
 
-    for a_type in _structure_union_type_priority:
+    for a_type in _STRUCTURE_UNION_TYPE_PRIORITY:
         if a_type in results:
             return results[a_type]
     return None
@@ -121,7 +71,7 @@ def _try_structure_object(value: Any, goal_type: Any) -> Any:
                 for k, v in value.items()
             }
         )
-    except (KeyError, ValueError) as e:
+    except (KeyError, ValueError):
         pass
     if issubclass(goal_type, dict):
         dict_value_type = goal_type.__args__[1]
@@ -136,18 +86,18 @@ def _try_convert_string_to_decimal(value):
         raise ValueError from ex
 
 
-_structure_str_goal_type_to_conversion_map = {
-    int: lambda v: int(v),
-    float: lambda v: float(v),
-    decimal.Decimal: lambda v: _try_convert_string_to_decimal(v),
-    datetime.datetime: lambda v: datetime.datetime.fromisoformat(v),
-    datetime.date: lambda v: datetime.date.fromisoformat(v),
-    uuid.UUID: lambda v: uuid.UUID(v),
+_STRUCTURE_STR_GOAL_TYPE_TO_CONVERSION_MAP = {
+    int: int,
+    float: float,
+    decimal.Decimal: _try_convert_string_to_decimal,
+    datetime.datetime: datetime.datetime.fromisoformat,
+    datetime.date: datetime.date.fromisoformat,
+    uuid.UUID: uuid.UUID,
 }
 
 
 def _try_structure_str(value: str, goal_type: Any) -> Any:
-    conversion = _structure_str_goal_type_to_conversion_map.get(goal_type)
+    conversion = _STRUCTURE_STR_GOAL_TYPE_TO_CONVERSION_MAP.get(goal_type)
     if conversion:
         try:
             return conversion(value)
@@ -199,3 +149,33 @@ def _try_structure_set(value: Set[Any], goal_type: Any) -> Set:
 def _try_structure_tuple(value: Tuple[Any], goal_type: Any) -> Tuple:
     tuple_content_types = goal_type.__args__
     return tuple(structure(value[i], t) for i, t in enumerate(tuple_content_types))
+
+
+# When structuring values the first value in each pair is used as a condition
+# which if true will attempt to structure the value using the second item in
+# the pair. Both items in the pair will be called with the value as the first
+# argument and the "goal type" as the second argument.
+# The order of this list of pairs denotes what order values will be structured
+# by.
+_STRUCTURE_VALUE_CONDITION_CONVERSION_PAIRS = [
+    (lambda v, gt: isinstance(v, dict), _try_structure_object),
+    (lambda v, gt: getattr(gt, "_name", None) == "Tuple", _try_structure_tuple),
+    (lambda v, gt: getattr(gt, "_name", None) == "Set", _try_structure_set),
+    (lambda v, gt: getattr(gt, "_name", None) == "List", _try_structure_list),
+    (lambda v, gt: isinstance(v, float), _try_structure_float),
+    (lambda v, gt: isinstance(v, int), _try_structure_int),
+    (lambda v, gt: isinstance(v, str), _try_structure_str),
+]
+
+
+def _structure_value(value: Any, goal_type: Type[T]) -> T:
+    for condition, conversion in _STRUCTURE_VALUE_CONDITION_CONVERSION_PAIRS:
+        if condition(value, goal_type):
+            # This could be a good place for PEP 572 the assignment operator
+            # but since Python 3.7 is a target we shall do without.
+            obj = conversion(value, goal_type)
+            if obj is not None:
+                return obj
+    raise ValueError(
+        f"Could not structure: {value} of type {type(value)} into {goal_type}"
+    )

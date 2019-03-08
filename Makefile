@@ -32,5 +32,4 @@ format:  ## Run the auto formatter against the code
 lint:  ## Run the the linter across the code
 	pipenv run pylint --rcfile=.pylintrc dataclass_structor tests
 
-
 .PHONY: typecheck test format perf-tests build-docs check-format

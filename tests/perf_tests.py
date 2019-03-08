@@ -1,10 +1,11 @@
-import typing
-import perf
-import decimal
 import datetime
+import decimal
+import typing
+
+import perf  # pylint: disable=import-error
 
 from dataclass_structor import structure, unstructure
-from _fixtures import AnimalEnum, DataClassGuest, SoundsEnum
+from ._fixtures import AnimalEnum, DataClassGuest, SoundsEnum
 
 
 def unstructure_assorted_primatives():
@@ -57,8 +58,8 @@ def structure_dataclass():
     structure({"first_name": "Bobby Jim"}, DataClassGuest)
 
 
-runner = perf.Runner(processes=5)
-benchmark_fns = [
+RUNNER = perf.Runner(processes=5)
+BENCHMARK_FNS = [
     unstructure_assorted_primatives,
     structure_assorted_primatives,
     unstructure_assorted_simple_types,
@@ -70,5 +71,5 @@ benchmark_fns = [
     structure_dataclass,
 ]
 
-for fn in benchmark_fns:
-    runner.bench_func(fn.__name__, fn)
+for fn in BENCHMARK_FNS:
+    RUNNER.bench_func(fn.__name__, fn)

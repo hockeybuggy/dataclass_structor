@@ -21,32 +21,41 @@ def unstructure(value: Any) -> Any:
       >>> dataclass_structor.unstructure(datetime.date(2018, 9, 5))
       "2018-09-05"
     """
-    if value is None:
-        return value
-    if isinstance(value, str):
-        return value
-    if isinstance(value, float):
-        return value
-    if isinstance(value, int):
-        return value
-    if isinstance(value, decimal.Decimal):
-        return str(value)
-    if isinstance(value, uuid.UUID):
-        return str(value)
-    if isinstance(value, enum.Enum):
-        return value.name
-    if isinstance(value, datetime.datetime) or isinstance(value, datetime.date):
-        return value.isoformat()
-    if isinstance(value, list):
-        return [unstructure(v) for v in value]
-    if isinstance(value, tuple):
-        return tuple([unstructure(v) for v in value])
-    if isinstance(value, set):
-        return set([unstructure(v) for v in value])
-    if isinstance(value, dict):
-        return {k: unstructure(v) for k, v in value.items()}
-    if is_dataclass(value):
-        return {f.name: unstructure(getattr(value, f.name)) for f in fields(value)}
-    if hasattr(value, "__slots__"):
-        return {f: unstructure(getattr(value, f)) for f in value.__slots__}
+    for condition, conversion in _UNSTRUCTURE_VALUE_CONDITION_CONVERSION_PAIRS:
+        if condition(value):
+            return conversion(value)
+
     raise ValueError(f"Could not unstructure: {value}")
+
+
+_UNSTRUCTURE_VALUE_CONDITION_CONVERSION_PAIRS = [
+    (lambda v: v is None, lambda v: v),
+    (lambda v: isinstance(v, str), lambda v: v),
+    (lambda v: isinstance(v, float), lambda v: v),
+    (lambda v: isinstance(v, int), lambda v: v),
+    (lambda v: isinstance(v, decimal.Decimal), str),  # `str` is a constructor here
+    (lambda v: isinstance(v, uuid.UUID), str),
+    (lambda v: isinstance(v, enum.Enum), lambda v: v.name),
+    (
+        lambda v: isinstance(v, (datetime.datetime, datetime.date)),
+        lambda v: v.isoformat(),
+    ),
+    (lambda v: isinstance(v, list), lambda v: [unstructure(i) for i in v]),
+    (lambda v: isinstance(v, tuple), lambda v: tuple([unstructure(i) for i in v])),
+    (
+        lambda v: isinstance(v, set),
+        lambda v: set([unstructure(i) for i in v]),  # pylint: disable=R1718
+    ),
+    (
+        lambda v: isinstance(v, dict),
+        lambda value: {k: unstructure(v) for k, v in value.items()},
+    ),
+    (
+        is_dataclass,
+        lambda v: {f.name: unstructure(getattr(v, f.name)) for f in fields(v)},
+    ),
+    (
+        lambda v: hasattr(v, "__slots__"),
+        lambda v: {f: unstructure(getattr(v, f)) for f in v.__slots__},
+    ),
+]

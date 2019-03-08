@@ -1,6 +1,6 @@
 from dataclass_structor import structure, unstructure
 
-from _fixtures import DataClassGuest as Guest
+from ._fixtures import DataClassGuest as Guest
 
 
 def test_unstructure__guest_with_first_name():

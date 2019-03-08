@@ -2,10 +2,10 @@ import datetime
 import decimal
 import uuid
 
-import pytest
+import pytest  # pylint: disable=import-error
 
 from dataclass_structor import structure
-from _fixtures import AnimalEnum, SoundsEnum
+from ._fixtures import AnimalEnum, SoundsEnum
 
 
 def test_structure__bad_str__int():
