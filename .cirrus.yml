@@ -5,7 +5,7 @@ test_task:
   pip_cache:
     folder: ~/.cache/pip
     fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock && echo "cache version 1"
-    populate_script: pip install mypy pytest black
+    populate_script: pip install black mypy pylint pytest
 
   test_script: python -m pytest
 
@@ -13,7 +13,7 @@ typecheck_task:
   pip_cache:
     folder: ~/.cache/pip
     fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock && echo "cache version 1"
-    populate_script: pip install mypy pytest black
+    populate_script: pip install black mypy pylint pytest
 
   test_script: python -m mypy dataclass_structor
 
@@ -21,6 +21,14 @@ formatter_task:
   pip_cache:
     folder: ~/.cache/pip
     fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock && echo "cache version 1"
-    populate_script: pip install mypy pytest black
+    populate_script: pip install black mypy pylint pytest
 
-  test_script: python -m black --diff --check dataclass_structor tests
+  test_script: python -m pylint
+
+linter_task:
+  pip_cache:
+    folder: ~/.cache/pip
+    fingerprint_script: echo $PYTHON_VERSION && cat Pipfile.lock && echo "cache version 1"
+    populate_script: pip install black mypy pylint pytest
+
+  test_script: pylint --rcfile=.pylintrc dataclass_structor tests

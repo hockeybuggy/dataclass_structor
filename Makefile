@@ -26,8 +26,11 @@ build-docs:  ## Generate the docs
 check-format: ## Check that the code formatting is up to snuff
 	pipenv run python -m black --diff --check dataclass_structor tests
 
-format:  ## Run the auto formatted against the code
+format:  ## Run the auto formatter against the code
 	pipenv run python -m black dataclass_structor tests
+
+lint:  ## Run the the linter across the code
+	pipenv run pylint --rcfile=.pylintrc dataclass_structor tests
 
 
 .PHONY: typecheck test format perf-tests build-docs check-format

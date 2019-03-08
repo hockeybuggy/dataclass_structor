@@ -8,12 +8,13 @@ name = "pypi"
 "e1839a8" = {path = ".", editable = true}
 
 [dev-packages]
-pytest = "*"
 black = "*"
 mypy = "*"
+perf = "*"
+pylint = "*"
+pytest = "*"
 sphinx = "*"
 sphinx-autobuild = "*"
-perf = "*"
 
 [requires]
 python_version = "3.7"
