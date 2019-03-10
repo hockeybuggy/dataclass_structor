@@ -1,3 +1,4 @@
+"""Typed object structure/destructure."""
 from .structure import structure
 from .unstructure import unstructure
 
