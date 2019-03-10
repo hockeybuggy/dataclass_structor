@@ -1,6 +1,6 @@
 from setuptools import setup
 
-from _version import VERSION
+from dataclass_structor._version import VERSION
 
 with open('README.md') as readme:
     README = readme.read()
