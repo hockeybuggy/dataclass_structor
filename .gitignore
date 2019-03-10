@@ -10,3 +10,5 @@ dist/
 .doctrees
 _build
 *bench.json
+publish.sh
+NOTES.md
