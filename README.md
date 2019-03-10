@@ -24,7 +24,9 @@ The [docs for this project can be found here](dataclass-structor.readthedocs.io)
 ## Example
 
 ```python
+
 import dataclasses
+import typing
 
 from dataclass_structor import structure, unstructure
 
