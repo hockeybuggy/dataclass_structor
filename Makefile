@@ -19,7 +19,7 @@ perf-tests:  ## Run the performace tests
 	pipenv run python tests/perf_tests.py -o bench.json
 
 build-docs:  ## Generate the docs
-	pipenv run python -m sphinx-build -b html . ./_build
+	pipenv run sphinx-build -b html . ./_build
 
 ##
 

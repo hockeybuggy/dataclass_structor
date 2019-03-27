@@ -22,11 +22,11 @@ project = 'dataclass_structor'
 copyright = '2018, Douglas Anderson'
 author = 'Douglas Anderson'
 
-from _version import VERSION
+from dataclass_structor import __version__
 # The short X.Y version
-version = VERSION
+version = __version__
 # The full version, including alpha/beta/rc tags
-release = VERSION + '-alpha'
+release = __version__ + '-alpha'
 
 
 # -- General configuration ---------------------------------------------------
