@@ -40,7 +40,6 @@ To format the code run::
 
     make format  # This will run black
 
-To format the code run::
 
 Running performance tests:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -67,6 +66,27 @@ If you would like to update documentation::
     git clone dataclass_structor
     pipenv install --dev
     make build-docs
+
+
+Publishing a version
+^^^^^^^^^^^^^^^^^^^^
+
+To publish a new version you need to have access to PyPi and ReadTheDocs. For
+now Douglas Anderson will publish all releases for simplicity.
+
+1. Update the `__version__` in `dataclass_structor/__init__.py`.
+2. Update the `CHANGELOG.md` moving the items in the `Unreleased` section to a
+   section with the version in bracets, a hyphen then the date (YYYY-MM-DD).
+3. Commit these changes. Use the following template::
+    Cutting version `X.Y.Z`
+
+    User facing changes:
+    https://github.com/hockeybuggy/dataclass_structor/blob/master/CHANGELOG.md#XYZ---YYYY-MM-DD
+4. One this commit has landed in the master branch, create a git tag: ``git tag -s vX.Y.Z -m "Version X.Y.Z"``
+5. Push the tag: ``git push --tags``
+6. Remove the existing build ``rm -r dist``
+7. Publish the package to PyPi: ``flit publish``
+
 
 Code of Conduct
 ---------------

@@ -3,7 +3,7 @@ Quick start
 
 This document should help you get up and running with `dataclass_structor`.
 
-Start by installing the package by installation_
+Start by installing the package by following the instructions in :ref:`installation`
 
 
 Lets say that you have these two dataclasses::
