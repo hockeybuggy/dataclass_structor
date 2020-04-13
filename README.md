@@ -18,7 +18,7 @@ pip install dataclass_structor
 
 ## Documentation
 
-The [docs for this project can be found here](dataclass-structor.readthedocs.io).
+The [docs for this project can be found here](https://dataclass-structor.readthedocs.io).
 
 
 ## Example
